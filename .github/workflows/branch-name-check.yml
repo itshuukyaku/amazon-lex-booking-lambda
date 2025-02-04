@@ -1,0 +1,39 @@
+name: Check Branch Name
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  check-branch-name:
+    name: Validate Branch Name
+    runs-on: ubuntu-latest
+    env:
+      SKIP_VALIDATION: "false"  # 初期値
+    steps:
+      - name: Get Branch Name
+        id: branch-name
+        run: |
+          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Determine if branch validation should be skipped
+        id: check-skip
+        run: |
+          if [[ "$BRANCH_NAME" == *patch* ]]; then
+            echo "🔄 Skipping validation: auto-generated branch (contains 'patch')"
+            echo "SKIP_VALIDATION=true" >> $GITHUB_ENV
+          elif [[ "$BRANCH_NAME" =~ ^(develop|test|release|demo|sample)$ ]]; then
+            echo "✅ Allowed branch: $BRANCH_NAME"
+            echo "SKIP_VALIDATION=true" >> $GITHUB_ENV
+          fi
+
+      - name: Validate Branch Name
+        if: env.SKIP_VALIDATION == 'false'
+        run: |
+          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|hotfix|release)/[a-z0-9._-]+$ ]]; then
+            echo "🚨 Error: Branch name '$BRANCH_NAME' does not follow the naming convention."
+            echo "Valid formats: feature/XXX, fix/XXX, hotfix/XXX, release/XXX, or allowed branch names (develop, test, release, demo, sample, *patch*)."
+            exit 1
+          fi
+          echo "✅ Branch name '$BRANCH_NAME' follows the naming convention."
