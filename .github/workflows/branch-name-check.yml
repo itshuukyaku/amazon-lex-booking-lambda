@@ -17,20 +17,15 @@ jobs:
         run: |
           echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
-      - name: Check if auto-generated branch (contains 'patch')
-        id: check-patch
+      - name: Determine if branch validation should be skipped
+        id: check-skip
         run: |
           if [[ "$BRANCH_NAME" == *patch* ]]; then
-            echo "🔄 Skipping branch name validation for auto-generated branch: $BRANCH_NAME"
+            echo "🔄 Skipping validation: auto-generated branch (contains 'patch')"
             echo "SKIP_VALIDATION=true" >> $GITHUB_ENV
-          fi
-
-      - name: Allow specific manually created branches
-        if: env.SKIP_VALIDATION == 'false'
-        run: |
-          if [[ "$BRANCH_NAME" =~ ^(develop|test|release|demo|sample)$ ]]; then
+          elif [[ "$BRANCH_NAME" =~ ^(develop|test|release|demo|sample)$ ]]; then
             echo "✅ Allowed branch: $BRANCH_NAME"
-            exit 0
+            echo "SKIP_VALIDATION=true" >> $GITHUB_ENV
           fi
 
       - name: Validate Branch Name
