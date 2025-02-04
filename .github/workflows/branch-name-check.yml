@@ -16,7 +16,7 @@ jobs:
 
       - name: Skip validation for auto-generated branches
         run: |
-          if [[ "$BRANCH_NAME" =~ patch ]]; then
+          if [[ "$BRANCH_NAME" == *patch* ]]; then
             echo "🔄 Skipping branch name validation for auto-generated branch: $BRANCH_NAME"
             exit 0
           fi
