@@ -1,0 +1,37 @@
+name: Check Branch Name
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - develop
+
+jobs:
+  check-branch-name:
+    name: Validate Branch Name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Branch Name
+        id: branch-name
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+
+      - name: Skip validation for auto-generated branches
+        run: |
+          if [[ "$BRANCH_NAME" =~ ^[a-zA-Z0-9._-]+-patch-[0-9]+$ ]] || [[ "$BRANCH_NAME" =~ ^dependabot/.*$ ]]; then
+            echo "🔄 Skipping branch name validation for auto-generated branch: $BRANCH_NAME"
+            exit 0
+          fi
+
+      - name: Validate Branch Name
+        run: |
+          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|hotfix|release)/[a-z0-9._-]+$ ]]; then
+            echo "🚨 Error: Branch name '$BRANCH_NAME' does not follow the naming convention."
+            echo "Valid formats: feature/XXX, fix/XXX, hotfix/XXX, release/XXX"
+            exit 1
+          fi
+
+          if [[ "$BRANCH_NAME" =~ ^(feature|fix|hotfix)/[a-z_-]+$ ]]; then
+            echo "⚠️ Warning: It's recommended to use a ticket number (e.g., 'feature/123-add-login') but it's not mandatory."
+          fi
+
+          echo "✅ Branch name '$BRANCH_NAME' follows the naming convention."
