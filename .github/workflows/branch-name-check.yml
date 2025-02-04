@@ -16,7 +16,7 @@ jobs:
 
       - name: Skip validation for auto-generated branches
         run: |
-          if [[ "$BRANCH_NAME" =~ ^.+-patch-[0-9]+$ ]] || [[ "$BRANCH_NAME" =~ ^dependabot/.*$ ]]; then
+          if [[ "$BRANCH_NAME" =~ patch ]]; then
             echo "🔄 Skipping branch name validation for auto-generated branch: $BRANCH_NAME"
             exit 0
           fi
@@ -32,7 +32,7 @@ jobs:
         run: |
           if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|hotfix|release)/[a-z0-9._-]+$ ]]; then
             echo "🚨 Error: Branch name '$BRANCH_NAME' does not follow the naming convention."
-            echo "Valid formats: feature/XXX, fix/XXX, hotfix/XXX, release/XXX, or allowed branch names (develop, test, release, demo, sample)."
+            echo "Valid formats: feature/XXX, fix/XXX, hotfix/XXX, release/XXX, or allowed branch names (develop, test, release, demo, sample, *patch*)."
             exit 1
           fi
           echo "✅ Branch name '$BRANCH_NAME' follows the naming convention."
