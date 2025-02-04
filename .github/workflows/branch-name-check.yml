@@ -4,7 +4,6 @@ on:
   push:
     branches-ignore:
       - main
-      - develop
 
 jobs:
   check-branch-name:
@@ -22,16 +21,18 @@ jobs:
             exit 0
           fi
 
+      - name: Allow specific manually created branches
+        run: |
+          if [[ "$BRANCH_NAME" =~ ^(develop|test|release|demo|sample)$ ]]; then
+            echo "✅ Allowed branch: $BRANCH_NAME"
+            exit 0
+          fi
+
       - name: Validate Branch Name
         run: |
           if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|hotfix|release)/[a-z0-9._-]+$ ]]; then
             echo "🚨 Error: Branch name '$BRANCH_NAME' does not follow the naming convention."
-            echo "Valid formats: feature/XXX, fix/XXX, hotfix/XXX, release/XXX"
+            echo "Valid formats: feature/XXX, fix/XXX, hotfix/XXX, release/XXX, or allowed branch names (develop, test, release, demo, sample)."
             exit 1
           fi
-
-          if [[ "$BRANCH_NAME" =~ ^(feature|fix|hotfix)/[a-z_-]+$ ]]; then
-            echo "⚠️ Warning: It's recommended to use a ticket number (e.g., 'feature/123-add-login') but it's not mandatory."
-          fi
-
           echo "✅ Branch name '$BRANCH_NAME' follows the naming convention."
