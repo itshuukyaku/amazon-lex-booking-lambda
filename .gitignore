@@ -4,3 +4,15 @@ venv/*
 task.md
 bk.py
 sample.json
+# Node.js の標準無視リスト
+node_modules/
+npm-debug.log
+yarn-error.log
+.DS_Store
+
+# Husky の一時ファイル
+.husky-*
+.husky/*
+.husky/_/
+!.husky/commit-msg
+!.husky/pre-commit
