@@ -12,11 +12,11 @@ jobs:
     steps:
       - name: Get Branch Name
         id: branch-name
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Skip validation for auto-generated branches
         run: |
-          if [[ "$BRANCH_NAME" =~ ^[a-zA-Z0-9._-]+-patch-[0-9]+$ ]] || [[ "$BRANCH_NAME" =~ ^dependabot/.*$ ]]; then
+          if [[ "$BRANCH_NAME" =~ ^.+-patch-[0-9]+$ ]] || [[ "$BRANCH_NAME" =~ ^dependabot/.*$ ]]; then
             echo "🔄 Skipping branch name validation for auto-generated branch: $BRANCH_NAME"
             exit 0
           fi
